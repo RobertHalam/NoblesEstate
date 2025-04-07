@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Create Listing</h1>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Title Field -->
+    <div>
+        <label for="id_title">Title:</label>
+        <input type="text" name="title" id="id_title" value="{{ form.title.value|default_if_none:'' }}">
+        {% if form.title.errors %}
+            <p style="color:red;">{{ form.title.errors }}</p>
+        {% endif %}
+    </div>
+
+
+
+
+    <div>
+        <label for="estateType">Estate Type</label>
+        <select name="estateType" id="estateType">
+            <option value="select">Select</option>
+            <option value="house">House</option>
+            <option value="building">Building</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="constructionType">Construction Type</label>
+        <select name="constructionType" id="constructionType">
+            <option value="select">Select</option>
+            <option value="cement">Cement</option>
+            <option value="wood">Wood</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="roofType">Roof Type</label>
+        <select name="roofType" id="roofType">
+            <option value="select">Select</option>
+            <option value="tin">Tin</option>
+            <option value="cement">Cement</option>
+        </select>
+    </div>
+
+
+
+    <div>
+        <label for="{{ form.constructionDate.id_for_label }}">Construction Date:</label>
+        {{ form.constructionDate }}
+    </div>
+
+
+    <div>
+        <label for="{{ form.description.id_for_label }}">Description:</label>
+        {{ form.description }}
+    </div>
+
+    <div>
+        <label for="{{ form.title.id_for_label }}">Title:</label>
+        {{ form.title }}
+    </div>
+
+    <div>
+        <label for="{{ form.price.id_for_label }}">Price:</label>
+        {{ form.price }}
+    </div>
+
+    <div>
+        <label for="{{ form.pricePerSqft.id_for_label }}">Price per Sqft:</label>
+        {{ form.pricePerSqft }}
+    </div>
+
+
+    <div>
+        <label for="{{ form.state.id_for_label }}">State:</label>
+        {{ form.state }}
+    </div>
+
+    <div>
+        <label for="{{ form.city.id_for_label }}">City:</label>
+        {{ form.city }}
+    </div>
+
+    <div>
+        <label for="{{ form.street.id_for_label }}">Street:</label>
+        {{ form.street }}
+    </div>
+
+    <div>
+        <label for="{{ form.pincode.id_for_label }}">Pincode:</label>
+        {{ form.pincode }}
+    </div>
+
+    <div>
+        <label for="{{ form.latitude.id_for_label }}">Latitude:</label>
+        {{ form.latitude }}
+    </div>
+
+    <div>
+        <label for="{{ form.longitude.id_for_label }}">Longitude:</label>
+        {{ form.longitude }}
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Primary Image Section -->
+    <h3>Primary Image</h3>
+    <div id="primary-image-preview">
+        <p>No primary image uploaded yet.</p>
+    </div>
+    <label for="id_image">Upload Primary Image:</label>
+    <input type="file" name="image" id="id_image">
+
+    <!-- Additional Images Section -->
+    <h3>Additional Images</h3>
+    <div id="new-additional-images-preview"></div>
+    <label for="id_images">Upload Additional Images:</label>
+    <input type="file" name="images" id="id_images" multiple>
+    
+<br><br><br>
+<h3>House Details</h3>
+
+    {{ form2.as_p }}
+
+
+
+<h3>Additional Details</h3>
+        <div id="add-more-section">
+            <div class="add-more-item">
+                <label for="add_more_items">Item:</label>
+                <input type="text" name="add_more_items" class="form-control" placeholder="Item name">
+                <label for="add_more_descriptions">Description:</label>
+                <textarea name="add_more_descriptions" class="form-control" placeholder="Item description"></textarea>
+            </div>
+        </div>
+    
+        <button type="button" id="add-more-btn" class="btn btn-secondary">Add More</button>
+        
+     <br>    
+    <script>
+        document.getElementById('add-more-btn').addEventListener('click', function() {
+            var container = document.getElementById('add-more-section');
+            var newItem = document.createElement('div');
+            newItem.classList.add('add-more-item');
+            newItem.innerHTML = `
+                <label for="add_more_items">Item:</label>
+                <input type="text" name="add_more_items" class="form-control" placeholder="Item name">
+                <label for="add_more_descriptions">Description:</label>
+                <textarea name="add_more_descriptions" class="form-control" placeholder="Item description"></textarea>
+            `;
+            container.appendChild(newItem);
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <button type="submit">Submit Listing</button>
+</form>
+
+<a href="{% url 'realtor_dashboard' %}">Cancel</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const primaryImageInput = document.getElementById("id_image");
+        const primaryImagePreview = document.getElementById("primary-image-preview");
+        const additionalImagesInput = document.getElementById("id_images");
+        const newAdditionalImagesPreview = document.getElementById("new-additional-images-preview");
+
+        // Preview new primary image
+        primaryImageInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    primaryImagePreview.innerHTML = `<img src="${e.target.result}" alt="Primary Image Preview" width="200">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                primaryImagePreview.innerHTML = "<p>No primary image uploaded yet.</p>";
+            }
+        });
+
+        // Preview new additional images
+        additionalImagesInput.addEventListener("change", function () {
+            newAdditionalImagesPreview.innerHTML = ""; // Clear previous previews
+            const files = Array.from(this.files);
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgDiv = document.createElement("div");
+                    imgDiv.style.display = "inline-block";
+                    imgDiv.style.margin = "10px";
+                    imgDiv.style.textAlign = "center";
+
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.alt = "New Additional Image Preview";
+                    img.width = 200;
+
+                    const removeButton = document.createElement("button");
+                    removeButton.textContent = "Remove";
+                    removeButton.type = "button";
+                    removeButton.classList.add("remove-new-image");
+                    removeButton.onclick = function() {
+                        imgDiv.remove();  // Remove the image preview
+                    };
+
+                    imgDiv.appendChild(img);
+                    imgDiv.appendChild(removeButton);
+                    newAdditionalImagesPreview.appendChild(imgDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    });
+</script>
+{% endblock %}
+

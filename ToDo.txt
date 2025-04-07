@@ -1,0 +1,26 @@
+# views.py
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def some_restricted_view(request):
+    if not request.user.is_email_verified:
+        return render(request, 'restricted_access.html')
+    # Regular view logic for verified users
+
+upadate the profile html with 
+{% if user.is_email_verified %}
+  <p>Email verified: Yes</p>
+  <!-- Display additional information -->
+{% else %}
+  <div class="alert alert-warning">
+      <p>Your email is not verified. Some information is hidden until verification.</p>
+      <a href="{% url 'request_verification_email' %}" class="btn btn-warning">Verify Email</a>
+  </div>
+{% endif %}
+
+0.0. CLEAN THE FAWKING CODE!!!!!!!!!
+2.remove the email field in the update user page
+3. require a proper password 
+4.Handle Error messages in accounts
+5.

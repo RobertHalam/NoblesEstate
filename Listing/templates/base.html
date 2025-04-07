@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %} <!-- Load static files -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title" name="page-title">{% block title %}Noble's Estate{% endblock %}</title>
+    <link id="stylesheet" name="stylesheet" rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Responsive Design using IDs */
+        
+    </style>
+</head>
+
+<body id="body-container" name="body-container">
+
+    <!-- Header Section -->
+    <header id="header" name="header">
+        <div id="nav-container" name="nav-container">
+            <nav id="nav-bar" name="nav-bar">
+                <ul id="nav-list" name="nav-list">
+                    <li id="nav-home" name="nav-home"><a href="/">Home</a></li>
+                    <li id="nav-buy" name="nav-buy"><a href="/buy/">Buy</a></li>
+                    <li id="nav-rent" name="nav-rent"><a href="/rent/">Rent</a></li>
+                    <li id="nav-sell" name="nav-sell"><a href="/sell/">Sell</a></li>
+                    <li id="nav-about" name="nav-about"><a href="{% url 'aboutus' %}">About Us</a></li>
+                    <li id="nav-contact" name="nav-contact"><a href="{% url 'contactus' %}">Contact Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <div id="main-container" name="main-container">
+        <main id="main-content" name="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Footer Section -->
+    <footer id="footer" name="footer">
+        <div id="footer-container" name="footer-container">
+            <p id="footer-text" name="footer-text">&copy; 2025 Noble's Estate. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script id="script-js" name="script-js" src="{% static 'js/script.js' %}"></script>
+</body>
+
+</html>

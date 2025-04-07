@@ -1,0 +1,222 @@
+{% block content %}
+<h1>Edit Listing</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <!-- Title Field -->
+    <div>
+        <label for="id_title">Title:</label>
+        <input type="text" name="title" id="id_title" value="{{ form.title.value|default_if_none:'' }}">
+        {% if form.title.errors %}
+            <p style="color:red;">{{ form.title.errors }}</p>
+        {% endif %}
+    </div>
+
+         <!-- Estate Type Dropdown -->
+    <div>
+        <label for="estateType">Estate Type</label>
+        <select name="estateType" id="estateType">
+            <option value="select" {% if listing.estateType == 'select' %}selected{% endif %}>Select</option>
+            <option value="house" {% if listing.estateType == 'house' %}selected{% endif %}>House</option>
+            <option value="building" {% if listing.estateType == 'building' %}selected{% endif %}>Building</option>
+        </select>
+    </div>
+
+    <!-- Construction Type Dropdown -->
+    <div>
+        <label for="constructionType">Construction Type</label>
+        <select name="constructionType" id="constructionType">
+            <option value="select" {% if listing.constructionType == 'select' %}selected{% endif %}>Select</option>
+            <option value="cement" {% if listing.constructionType == 'cement' %}selected{% endif %}>Cement</option>
+            <option value="wood" {% if listing.constructionType == 'wood' %}selected{% endif %}>Wood</option>
+        </select>
+    </div>
+
+    <!-- Roof Type Dropdown -->
+    <div>
+        <label for="roofType">Roof Type</label>
+        <select name="roofType" id="roofType">
+            <option value="select" {% if listing.roofType == 'select' %}selected{% endif %}>Select</option>
+            <option value="tin" {% if listing.roofType == 'tin' %}selected{% endif %}>Tin</option>
+            <option value="cement" {% if listing.roofType == 'cement' %}selected{% endif %}>Cement</option>
+        </select>
+    </div>
+    <!-- Description Field -->
+    <div>
+        <label for="id_description">Description:</label>
+        <textarea name="description" id="id_description">{{ form.description.value|default_if_none:'' }}</textarea>
+        {% if form.description.errors %}
+            <p style="color:red;">{{ form.description.errors }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Price Field -->
+    <div>
+        <label for="id_price">Price:</label>
+        <input type="number" name="price" id="id_price" value="{{ form.price.value|default_if_none:'' }}" step="0.01">
+        {% if form.price.errors %}
+            <p style="color:red;">{{ form.price.errors }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Primary Image Section -->
+    <h3>Primary Image</h3>
+    {% if listing.image %}
+        <div id="primary-image-preview">
+            <img src="{{ listing.image.url }}" alt="Primary Image" width="200">
+        </div>
+    {% else %}
+        <div id="primary-image-preview">
+            <p>No primary image uploaded yet.</p>
+        </div>
+    {% endif %}
+    <label for="id_image">Change Primary Image:</label>
+    <input type="file" name="image" id="id_image">
+
+    <!-- Additional Images Section -->
+    <h3>Additional Images</h3>
+    <div id="additional-images">
+        {% for image in additional_images %}
+            <div id="image-{{ image.id }}" style="display: inline-block; margin: 10px; text-align: center;">
+                <img src="{{ image.image.url }}" alt="Additional Image" width="200">
+                <button type="button" class="delete-image" data-image-id="{{ image.id }}">Delete</button>
+            </div>
+        {% empty %}
+            <p>No additional images uploaded yet.</p>
+        {% endfor %}
+    </div>
+
+    <h3>Upload New Additional Images</h3>
+    <input type="file" name="images" id="additional-images-input" multiple>
+    <div id="new-additional-images-preview"></div>
+
+
+
+
+
+     <!-- Detail Form -->
+     <div class="detail-form">
+        <h2>Property Details</h2>
+        {{ detail_form.as_p }}
+      </div>
+
+
+
+
+
+
+
+
+
+    <h3>Add More Items</h3>
+    {% for item in add_more_items %}
+        <div>
+            <input type="text" name="add_more_item_{{ item.id }}" value="{{ item.item }}" placeholder="Item Name">
+            <textarea name="add_more_item_{{ item.id }}" placeholder="Description">{{ item.description }}</textarea>
+            <label>
+                <input type="checkbox" name="delete_add_more" value="{{ item.id }}"> Delete this item
+            </label>
+        </div>
+    {% empty %}
+        <p>No additional items added.</p>
+    {% endfor %}
+    
+    <h3>Add New Item</h3>
+    <input type="text" name="new_item" placeholder="Item Name">
+    <textarea name="new_item_description" placeholder="Description"></textarea>
+
+
+
+
+
+
+
+    <button type="submit">Save Changes</button>
+</form>
+
+<a href="{% url 'realtor_dashboard' %}">Cancel</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteButtons = document.querySelectorAll(".delete-image");
+        const deleteImagesInput = document.createElement("input");
+        deleteImagesInput.type = "hidden";
+        deleteImagesInput.name = "delete_images";
+        deleteImagesInput.id = "delete-images";
+        deleteImagesInput.value = "";
+        document.querySelector("form").appendChild(deleteImagesInput);
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const imageId = this.dataset.imageId;
+                const imageDiv = document.getElementById(`image-${imageId}`);
+
+                // Mark image for deletion
+                let deleteImages = deleteImagesInput.value ? deleteImagesInput.value.split(",") : [];
+                if (!deleteImages.includes(imageId)) {
+                    deleteImages.push(imageId);
+                }
+                deleteImagesInput.value = deleteImages.join(",");
+
+                // Hide the image preview instead of deleting it
+                imageDiv.style.display = "none";
+            });
+        });
+
+        // Preview new primary image
+        const primaryImageInput = document.getElementById("id_image");
+        const primaryImagePreview = document.getElementById("primary-image-preview");
+
+        primaryImageInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    primaryImagePreview.innerHTML = `<img src="${e.target.result}" alt="Primary Image Preview" width="200">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                primaryImagePreview.innerHTML = "<p>No primary image uploaded yet.</p>";
+            }
+        });
+
+        // Preview new additional images
+        const additionalImagesInput = document.getElementById("additional-images-input");
+        const newAdditionalImagesPreview = document.getElementById("new-additional-images-preview");
+
+        additionalImagesInput.addEventListener("change", function () {
+            newAdditionalImagesPreview.innerHTML = ""; // Clear previous previews
+            const files = Array.from(this.files);
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgDiv = document.createElement("div");
+                    imgDiv.style.display = "inline-block";
+                    imgDiv.style.margin = "10px";
+                    imgDiv.style.textAlign = "center";
+
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.alt = "New Additional Image Preview";
+                    img.width = 200;
+
+                    const removeButton = document.createElement("button");
+                    removeButton.textContent = "Remove";
+                    removeButton.type = "button";
+                    removeButton.classList.add("remove-new-image");
+                    removeButton.onclick = function() {
+                        imgDiv.remove();  // Remove the image preview
+                    };
+
+                    imgDiv.appendChild(img);
+                    imgDiv.appendChild(removeButton);
+                    newAdditionalImagesPreview.appendChild(imgDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    });
+</script>
+{% endblock %}

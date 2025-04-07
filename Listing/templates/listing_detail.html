@@ -1,0 +1,84 @@
+<div class="listing-detail">
+    <h1>{{ listing.title }}</h1>
+    <p>{{ listing.description }}</p>
+    <p>estateType: {{ listing.estateType }}</p>
+    <p>Construction: {{ listing.constructionType }}</p>
+    <p>Roof: {{ listing.roofType }}</p>
+    <p>Price: ${{ listing.price }}</p>
+
+
+    <p>Zip Code: ${{ listing.pincode }}</p>
+    <p>Price Per Sq_Feet: ${{ listing.pricePerSqft }}</p>
+    <p>State: ${{ listing.state }}</p>
+    <p>City: ${{ listing.city }}</p>
+    <p>Street: ${{ listing.street }}</p>
+    <p>Latitude: ${{ listing.latitude }}</p>
+    <p>Longtitude: ${{ listing.longitude }}</p>
+
+
+    <img src="{{ listing.image.url }}" alt="Primary image for {{ listing.title }}" width="200"/>
+    <h2>Additional Images</h2>
+    <div class="additional-images">
+        {% for img in listing.additional_images.all %}
+            <img src="{{ img.image.url }}" alt="Extra image for {{ listing.title }}"width="200" />
+        {% endfor %}
+    </div>
+
+
+    <h3>Details</h3>
+    {% if details %}
+        <p>Electric Phase: {{ details.electricPhase }}</p>
+        <p>Electric Volt: {{ details.electricVolt }}</p>
+        <p>Electric Amp: {{ details.electricAmp }}</p>
+        <p>Garage Available: {{ details.garageAvailable }}</p>
+        <p>Garage Length: {{ details.garageDimensionsL }}</p>
+        <p>Garage Breadth: {{ details.garageDimensionsB }}</p>
+        <p>Garage width: {{ details.garageDimensionsH }}</p>
+        <p>Garage Location: {{ details.garageLocation }}</p>
+        <p>Garage Fits: {{ details.garageCarFits }}</p>
+        <p>Pool Available: {{ details.poolAvailable }}</p>
+        <p>Pool Length: {{ details.poolDimensiondL }}</p>
+        <p>Pool Breadth: {{ details.poolDimensiondB }}</p>
+        <p>Pool width: {{ details.poolDimensiondH }}</p>
+        
+    {% else %}
+        <p>No detailed information available.</p>
+    {% endif %}
+     <!-- Additional Features -->
+     <h3>Additional Features:</h3>
+     <ul>
+         {% for add in listing.add_more.all %}
+             <li>
+                 <strong>{{ add.item }}</strong>: {{ add.description|default:"No description" }}
+             </li>
+         {% empty %}
+             <p>No additional features listed.</p>
+         {% endfor %}
+     </ul>
+     <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([0, 0], 2);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 20,
+        }).addTo(map);
+
+        // Add location markers
+        var locations = {{ locations | safe }};
+        locations.forEach(function (location) {
+            var marker = L.marker([location.latitude, location.longitude]).addTo(map);
+            marker.bindPopup('<b>' + location.name + '</b><br>' + location.category);
+        });
+
+        // Adjust the map view to fit all markers
+        if (locations.length > 0) {
+            var bounds = locations.map(loc => [loc.latitude, loc.longitude]);
+            map.fitBounds(bounds);
+        }
+    </script>
+
+</div>

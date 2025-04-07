@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Location Search</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Search Locations</h1>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([0, 0], 2);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 20,
+        }).addTo(map);
+
+        // Add location markers
+        var locations = {{ listings | safe }};
+        locations.forEach(function (listings) {
+            var marker = L.marker([listings.latitude, listings.longitude]).addTo(map);
+            marker.bindPopup('<b>' + listings.name + '</b><br>' + listings.category);
+        });
+
+        // Adjust the map view to fit all markers
+        if (locations.length > 0) {
+            var bounds = locations.map(loc => [loc.latitude, loc.longitude]);
+            map.fitBounds(bounds);
+        }
+    </script>
+</body>
+
+</html>

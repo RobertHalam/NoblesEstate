@@ -1,0 +1,35 @@
+{% block content %}
+{% load static %}
+  <h2>{{ user_type }} Profile</h2>
+  
+  <div class="profile-avatar">
+    {% if user.avatar %}
+        <img src="{{ user.avatar.url }}" alt="{{ user.first_name }}'s avatar" class="avatar-img" height="100" width="100"/>
+        {% else %}
+        <img src="{% static 'img/default_avatar.jpg' %}" alt="Default avatar" class="avatar-img" />
+        {% endif %}
+</div>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ avatar_form.avatar.label_tag }} {{ avatar_form.avatar }}
+  <button type="submit">Update Avatar</button>
+</form>
+
+  <p><strong>First Name:</strong> {{ user.first_name }}</p>
+  <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+
+  {% if user.is_email_verified %}
+  <p>Email verified: Yes</p>
+  <!-- Display additional information -->
+{% else %}
+  <div class="alert alert-warning">
+      <p>Your email is not verified. Some information is hidden until verification.</p>
+      <a href="{% url 'request_verification_email' %}" class="btn btn-warning">Verify Email</a>
+  </div>
+{% endif %}
+
+  <a href="{% url 'update_profile' %}" class="btn btn-primary">Update Profile</a>
+  <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+{% endblock %}

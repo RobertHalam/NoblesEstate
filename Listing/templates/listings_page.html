@@ -1,0 +1,78 @@
+<h1>Browse Listings</h1>
+<a href="{% url 'home' %}">Back to Home</a>
+<ul>
+    {% for listing in listings %}
+        <li>
+            <h3><a href="{% url 'listing_detail' listing.id %}">{{ listing.title }}</a></h3>
+            <p>{{ listing.description }}</p>
+            <p><strong>Price:</strong> ${{ listing.price }}</p>
+            <p><strong>Realtor:</strong> {{ listing.realtor.first_name }} {{ listing.realtor.last_name }}</p>
+            <img src="{{ listing.image.url }}" alt="{{ listing.title }}" width="200">
+        </li>
+    {% empty %}
+        <p>No listings available at the moment.</p>
+    {% endfor %}
+</ul>
+
+
+
+<form method="get">
+    <!-- Estate Type Filter -->
+    <label for="estateType">Estate Type:</label>
+    <select name="estateType" id="estateType">
+        <option value="select" {% if request.GET.estateType == 'select' %}selected{% endif %}>Select</option>
+        <option value="house" {% if request.GET.estateType == 'house' %}selected{% endif %}>House</option>
+        <option value="building" {% if request.GET.estateType == 'building' %}selected{% endif %}>Building</option>
+        <option value="land" {% if request.GET.estateType == 'land' %}selected{% endif %}>Land</option>
+    </select>
+    
+    <label for="constructionType">Construction Type:</label>
+    <select name="constructionType">
+        <option value="select" {% if request.GET.estateType == 'select' %}selected{% endif %}>Select</option>
+        <option value="wood" {% if request.GET.constructionType == 'wood' %}selected{% endif %}>Wood</option>
+        <option value="cement" {% if request.GET.constructionType == 'cement' %}selected{% endif %}>Cement</option>
+    </select>
+
+    <label for="roofType">Roof Type:</label>
+    <select name="roofType">
+        <option value="select" {% if request.GET.estateType == 'select' %}selected{% endif %}>Select</option>
+        <option value="tin" {% if request.GET.roofType == 'tin' %}selected{% endif %}>Tin</option>
+        <option value="cement" {% if request.GET.roofType == 'cement' %}selected{% endif %}>Cement</option>
+
+    </select>
+
+    <label for="sort_by">Sort By:</label>
+    <select name="sort_by">
+        <option value="price_asc" {% if request.GET.sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+        <option value="price_desc" {% if request.GET.sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+    </select>
+    <button type="submit">Sort</button>
+
+    <label for="created_after">Created After:</label>
+    <input type="date" name="created_after" value="{{ request.GET.created_after }}">
+
+    <button type="submit">Apply Filters</button>
+
+</form>
+
+<ul>
+    {% for listing in listings %}
+        <li>{{ listing.title }} - {{ listing.estateType }} - Rs. {{ listing.price }}</li>
+    {% endfor %}
+</ul>
+
+
+<div>
+    {% for rent in rents %}
+        <div class="listing">
+            <h3>{{ rent.price }}</h3>
+            lllllllllll
+            <img src="{{ rent.image.url }}" alt="">
+        </div>
+    {% empty %}
+        <p>No Rent found.</p>
+    {% endfor %}
+</div>
+
+
+
